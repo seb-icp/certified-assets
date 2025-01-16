@@ -49,15 +49,14 @@ Define an `Endpoint` with the URL where the asset will be hosted, the data for c
 > An Endpoint is a combination of the url path to the asset, and the http request and response details that are associated with the served asset.
 
 ```motoko
-    let endpoint = CertifiedAssets.Endpoint("/hello.txt", ?"Hello, World!");
+    let endpoint = CertifiedAssets.Endpoint("/hello.txt", ?Text.encodeUtf8("Hello, World!"));
     certs.certify(endpoint);
 ```
 
 The above method creates a new sha256 hash of the data, if you already have the hash, you can pass it in via the `hash()` method to avoid recomputing it.
 
 ```motoko
-    let endpoint = CertifiedAssets.Endpoint("/hello.txt", null)
-        .hash(hello_world_sha256_hash);
+    let endpoint = CertifiedAssets.Endpoint("/hello.txt", null).hash(hello_world_sha256_hash);
     certs.certify(endpoint);
 ```
 
@@ -82,11 +81,7 @@ When certifying assets, it's crucial to consider not just the content but also t
 
     let html_page = "<h2 style=\"color: red;\">Hello, World!</h2>";
 
-    let endpoint = CertifiedAssets.Endpoint("/hello.html", html_page);
-        .no_request_certification()
-        .status(200)
-        .response_header("Content-Type", "text/html");
-
+    let endpoint = CertifiedAssets.Endpoint("/hello.html", ?Text.encodeUtf8(html_page)).no_request_certification().status(200).response_header("Content-Type", "text/html");
     certs.certify(endpoint);
 
 ```
@@ -96,8 +91,8 @@ When certifying assets, it's crucial to consider not just the content but also t
 A unique hash is generated for each endpoint, so any change to the data will require re-certification. To re-certify an asset, you need to `remove()` the old one and `certify()` the new one.
 
 ```motoko
-    let old_endpoint = CertifiedAssets.Endpoint("/hello.txt", ?"Hello, World!");
-    let new_endpoint = CertifiedAssets.Endpoint("/hello.txt", ?"Hello, World! Updated");
+    let old_endpoint = CertifiedAssets.Endpoint("/hello.txt", ?Text.encodeUtf8("Hello, World!"));
+    let new_endpoint = CertifiedAssets.Endpoint("/hello.txt", ?Text.encodeUtf8("Hello, World! Updated"));
 
     certs.remove(endpoint);
     certs.certify(endpoint);
